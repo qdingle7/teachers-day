@@ -1,0 +1,127 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  }
+
+body {
+min-height: 100vh;
+font-family: Arial, sans-serif;
+background: linear-gradient(135deg, #f7f1ff, #e8f4ff);
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 20px;
+}
+
+.container {
+width: 100%;
+max-width: 800px;
+background: white;
+border-radius: 24px;
+padding: 35px;
+text-align: center;
+box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+h1 {
+font-size: 42px;
+margin-bottom: 10px;
+color: #333;
+}
+
+.subtitle {
+font-size: 19px;
+color: #666;
+margin-bottom: 30px;
+}
+
+button {
+border: none;
+border-radius: 12px;
+padding: 14px 24px;
+font-size: 17px;
+font-weight: bold;
+cursor: pointer;
+background: #6c5ce7;
+color: white;
+transition: transform 0.15s, opacity 0.15s;
+margin: 8px;
+}
+
+button:hover {
+transform: scale(1.04);
+opacity: 0.9;
+}
+
+#cameraSection {
+margin-top: 25px;
+}
+
+#video {
+width: 100%;
+max-width: 650px;
+border-radius: 18px;
+background: black;
+display: block;
+margin: 0 auto 15px;
+}
+
+#photoCounter {
+font-size: 18px;
+font-weight: bold;
+color: #555;
+margin: 10px;
+}
+
+#resultSection {
+margin-top: 25px;
+}
+
+#resultSection h2 {
+margin-bottom: 20px;
+color: #333;
+}
+
+#photoCanvas {
+width: 100%;
+max-width: 600px;
+border-radius: 10px;
+box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+display: block;
+margin: 0 auto 20px;
+}
+
+#downloadButton {
+background: #00a86b;
+}
+
+#retakeButton {
+background: #555;
+}
+
+.hidden {
+display: none !important;
+}
+
+@media (max-width: 600px) {
+
+```
+.container {
+    padding: 25px 15px;
+}
+
+h1 {
+    font-size: 32px;
+}
+
+.subtitle {
+    font-size: 16px;
+}
+
+button {
+    width: 90%;
+}
+```
+
+}

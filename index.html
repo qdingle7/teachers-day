@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teachers' Day Photobooth</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+```
+<div class="container">
+
+    <h1>Happy Teachers' Day!</h1>
+
+    <p class="subtitle">
+        Make a memory with us 📸
+    </p>
+
+    <button id="startButton">Take Photos</button>
+
+    <div id="cameraSection" class="hidden">
+
+        <video id="video" autoplay playsinline></video>
+
+        <p id="photoCounter">Photo 1 of 4</p>
+
+        <button id="captureButton">Take Photo</button>
+
+    </div>
+
+    <div id="resultSection" class="hidden">
+
+        <h2>Your Photo Booth Picture</h2>
+
+        <canvas id="photoCanvas"></canvas>
+
+        <br>
+
+        <button id="downloadButton">Download Photo</button>
+
+        <button id="retakeButton">Take Again</button>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+```
+
+</body>
+</html>
