@@ -229,23 +229,25 @@ function stopCamera() {
 // ================================
 
 function createPhotobooth() {
-    const photoWidth = 600;
-    const photoHeight = 450;
+    // Photobooth strip dimensions
+    const stripWidth = 700;
+    const photoWidth = 620;
+    const photoHeight = 465;
 
-    const spacing = 15;
+    const sideMargin = 40;
+    const topSpace = 125;
+    const gap = 20;
+    const bottomSpace = 130;
 
-    const topSpace = 80;
-    const bottomSpace = 100;
-
-    canvas.width =
-        (photoWidth * 2) +
-        (spacing * 3);
-
-    canvas.height =
+    // Calculate total height
+    const stripHeight =
         topSpace +
-        (photoHeight * 2) +
-        (spacing * 3) +
+        (photoHeight * 4) +
+        (gap * 3) +
         bottomSpace;
+
+    canvas.width = stripWidth;
+    canvas.height = stripHeight;
 
     const ctx = canvas.getContext("2d");
 
@@ -262,45 +264,98 @@ function createPhotobooth() {
         canvas.height
     );
 
-
     // ============================
-    // TITLE
+    // HEADER
     // ============================
 
     ctx.fillStyle = "#333333";
 
-    ctx.font = "bold 38px Arial";
+    ctx.font = "bold 42px Arial";
 
     ctx.textAlign = "center";
 
     ctx.fillText(
-        "Happy Teachers' Day!",
-        canvas.width / 2,
-        48
+        "HAPPY TEACHERS' DAY!",
+        stripWidth / 2,
+        55
     );
 
+    ctx.font = "22px Arial";
+
+    ctx.fillStyle = "#777777";
+
+    ctx.fillText(
+        "A memory with your students",
+        stripWidth / 2,
+        90
+    );
 
     // ============================
-    // DRAW PHOTOS
+    // DRAW FOUR PHOTOS
     // ============================
 
     photos.forEach((photo, index) => {
 
-        const column = index % 2;
-
-        const row = Math.floor(index / 2);
-
-        const x =
-            spacing +
-            column * (photoWidth + spacing);
-
+        const x = sideMargin;
         const y =
             topSpace +
-            spacing +
-            row * (photoHeight + spacing);
+            index * (photoHeight + gap);
+
+        // White photo border
+        ctx.fillStyle = "#eeeeee";
+
+        ctx.fillRect(
+            x - 5,
+            y - 5,
+            photoWidth + 10,
+            photoHeight + 10
+        );
+
+        // --------------------------------
+        // Crop photo without stretching
+        // --------------------------------
+
+        const sourceWidth = photo.width;
+        const sourceHeight = photo.height;
+
+        const sourceRatio =
+            sourceWidth / sourceHeight;
+
+        const targetRatio =
+            photoWidth / photoHeight;
+
+        let cropWidth = sourceWidth;
+        let cropHeight = sourceHeight;
+        let cropX = 0;
+        let cropY = 0;
+
+        if (sourceRatio > targetRatio) {
+
+            // Image is too wide
+            cropWidth =
+                sourceHeight * targetRatio;
+
+            cropX =
+                (sourceWidth - cropWidth) / 2;
+
+        } else {
+
+            // Image is too tall
+            cropHeight =
+                sourceWidth / targetRatio;
+
+            cropY =
+                (sourceHeight - cropHeight) / 2;
+        }
 
         ctx.drawImage(
             photo,
+
+            cropX,
+            cropY,
+            cropWidth,
+            cropHeight,
+
             x,
             y,
             photoWidth,
@@ -308,31 +363,31 @@ function createPhotobooth() {
         );
     });
 
-
     // ============================
-    // BOTTOM MESSAGE
+    // FOOTER
     // ============================
 
-    ctx.fillStyle = "#666666";
+    const footerY =
+        stripHeight - bottomSpace + 40;
 
-    ctx.font = "24px Arial";
+    ctx.fillStyle = "#555555";
 
-    ctx.textAlign = "center";
+    ctx.font = "bold 25px Arial";
 
     ctx.fillText(
-        "Thank you for making every class memorable!",
-        canvas.width / 2,
-        canvas.height - 55
+        "Thank you for everything!",
+        stripWidth / 2,
+        footerY
     );
 
-    ctx.font = "18px Arial";
+    ctx.font = "20px Arial";
 
     ctx.fillStyle = "#999999";
 
     ctx.fillText(
         "Teachers' Day 2026",
-        canvas.width / 2,
-        canvas.height - 25
+        stripWidth / 2,
+        footerY + 40
     );
 }
 
