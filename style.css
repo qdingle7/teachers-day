@@ -23,18 +23,15 @@ body {
         Arial,
         sans-serif;
 
-    background:
-        radial-gradient(
-            circle at 15% 15%,
-            rgba(255, 220, 225, 0.8),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at 85% 85%,
-            rgba(225, 220, 255, 0.7),
-            transparent 30%
-        ),
-        #faf7f5;
+    background: linear-gradient(
+        135deg,
+        #ADE1EF 0%,
+        #B7EDF7 20%,
+        #B4DAF9 40%,
+        #FEDBEC 60%,
+        #FBB1D3 80%,
+        #FFF1C2 100%
+    );
 
     color: #29252a;
 
@@ -65,7 +62,7 @@ body {
 .screen {
     width: 100%;
 
-    background: rgba(255, 255, 255, 0.82);
+    background: rgba(255, 255, 255, 0.72);
 
     border: 1px solid rgba(255, 255, 255, 0.9);
 
