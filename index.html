@@ -1,54 +1,236 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Teachers' Day Photobooth</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-```
-<div class="container">
+    <main class="app">
 
-    <h1>Happy Teachers' Day!</h1>
+        <!-- ========================= -->
+        <!-- LANDING SCREEN -->
+        <!-- ========================= -->
 
-    <p class="subtitle">
-        Make a memory with us 📸
-    </p>
+        <section id="homeSection" class="screen">
 
-    <button id="startButton">Take Photos</button>
+            <div class="top-badge">
+                <span>✦</span>
+                TEACHERS' DAY 2026
+                <span>✦</span>
+            </div>
 
-    <div id="cameraSection" class="hidden">
+            <div class="hero-icon">
+                📸
+            </div>
 
-        <video id="video" autoplay playsinline></video>
+            <h1>
+                Let's make a<br>
+                <span>memory.</span>
+            </h1>
 
-        <p id="photoCounter">Photo 1 of 4</p>
+            <p class="hero-subtitle">
+                Four photos. One little memory.<br>
+                Something to remember us by.
+            </p>
 
-        <button id="captureButton">Take Photo</button>
+            <button id="startButton" class="primary-button">
+                <span>Take Photos</span>
+                <span class="button-arrow">→</span>
+            </button>
 
-    </div>
+            <div class="how-it-works">
 
-    <div id="resultSection" class="hidden">
+                <div class="step">
+                    <div class="step-number">01</div>
+                    <div>
+                        <strong>Get ready</strong>
+                        <p>Allow camera access</p>
+                    </div>
+                </div>
 
-        <h2>Your Photo Booth Picture</h2>
+                <div class="step">
+                    <div class="step-number">02</div>
+                    <div>
+                        <strong>Strike a pose</strong>
+                        <p>We'll take 4 photos</p>
+                    </div>
+                </div>
 
-        <canvas id="photoCanvas"></canvas>
+                <div class="step">
+                    <div class="step-number">03</div>
+                    <div>
+                        <strong>Keep the memory</strong>
+                        <p>Download your photo strip</p>
+                    </div>
+                </div>
 
-        <br>
+            </div>
 
-        <button id="downloadButton">Download Photo</button>
+            <p class="tiny-footer">
+                Made with ♥ by your students
+            </p>
 
-        <button id="retakeButton">Take Again</button>
+        </section>
 
-    </div>
 
-</div>
+        <!-- ========================= -->
+        <!-- CAMERA SCREEN -->
+        <!-- ========================= -->
 
-<script src="script.js"></script>
-```
+        <section id="cameraSection" class="screen camera-screen hidden">
+
+            <div class="camera-header">
+
+                <button id="cameraBackButton" class="icon-button">
+                    ←
+                </button>
+
+                <div>
+                    <div class="camera-title">
+                        PHOTO BOOTH
+                    </div>
+
+                    <div class="camera-subtitle">
+                        Get ready!
+                    </div>
+                </div>
+
+                <div class="camera-logo">
+                    ✦
+                </div>
+
+            </div>
+
+
+            <!-- Progress -->
+
+            <div class="progress-area">
+
+                <div class="progress-label">
+                    <span id="photoCounter">Photo 1 of 4</span>
+                    <span id="progressPercent">25%</span>
+                </div>
+
+                <div class="progress-bar">
+                    <div id="progressFill"></div>
+                </div>
+
+                <div class="progress-dots">
+
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Camera -->
+
+            <div class="camera-wrapper">
+
+                <div class="camera-frame">
+
+                    <video
+                        id="video"
+                        autoplay
+                        playsinline
+                    ></video>
+
+                    <div class="camera-corner top-left"></div>
+                    <div class="camera-corner top-right"></div>
+                    <div class="camera-corner bottom-left"></div>
+                    <div class="camera-corner bottom-right"></div>
+
+                    <div id="countdownOverlay" class="countdown-overlay hidden">
+                        <span id="countdownNumber">3</span>
+                    </div>
+
+                    <div class="camera-tip">
+                        Look here ✦
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Capture -->
+
+            <div class="capture-area">
+
+                <p id="captureHint">
+                    Tap the button when you're ready
+                </p>
+
+                <button id="captureButton" class="shutter-button">
+
+                    <span class="shutter-inner"></span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- RESULT SCREEN -->
+        <!-- ========================= -->
+
+        <section id="resultSection" class="screen result-screen hidden">
+
+            <div class="result-badge">
+                ✦ MEMORY CAPTURED ✦
+            </div>
+
+            <h2>
+                Look at you! <span>♥</span>
+            </h2>
+
+            <p class="result-subtitle">
+                Here's your little Teachers' Day memory.
+            </p>
+
+
+            <div class="photo-preview">
+
+                <canvas id="photoCanvas"></canvas>
+
+            </div>
+
+
+            <div class="result-buttons">
+
+                <button id="downloadButton" class="primary-button result-download">
+                    <span>Download Photo</span>
+                    <span>↓</span>
+                </button>
+
+                <button id="retakeButton" class="secondary-button">
+                    ↻ &nbsp; Take Again
+                </button>
+
+            </div>
+
+            <p class="tiny-footer result-footer">
+                Teachers' Day • 2026
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <script src="script.js"></script>
 
 </body>
 </html>
