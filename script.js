@@ -459,18 +459,6 @@ function stopCamera() {
 
 function createPhotobooth() {
 
-    /*
-       TEMPORARY VERSION
-
-       This is still your current
-       vertical photo-strip design.
-
-       We'll replace ONLY this function
-       later when you give me the final
-       photobooth template.
-    */
-
-
     const stripWidth = 420;
 
     const photoWidth = 360;
@@ -493,22 +481,19 @@ function createPhotobooth() {
         bottomSpace;
 
 
-    canvas.width =
-        stripWidth;
+    canvas.width = stripWidth;
 
-    canvas.height =
-        stripHeight;
+    canvas.height = stripHeight;
 
 
-    const ctx =
-        canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
 
-    /* Background */
+    /* =========================================
+       COLOURED BORDER / BACKGROUND
+    ========================================= */
 
-    ctx.fillStyle =
-        "#fffafc";
-
+    ctx.fillStyle = selectedBorderColor;
 
     ctx.fillRect(
         0,
@@ -518,19 +503,29 @@ function createPhotobooth() {
     );
 
 
-    /* Title */
+    /* =========================================
+       INNER WHITE AREA
+    ========================================= */
 
-    ctx.fillStyle =
-        "#333333";
+    ctx.fillStyle = "#ffffff";
+
+    ctx.fillRect(
+        10,
+        10,
+        canvas.width - 20,
+        canvas.height - 20
+    );
 
 
-    ctx.font =
-        "bold 27px Arial";
+    /* =========================================
+       TITLE
+    ========================================= */
 
+    ctx.fillStyle = "#333333";
 
-    ctx.textAlign =
-        "center";
+    ctx.font = "bold 27px Arial";
 
+    ctx.textAlign = "center";
 
     ctx.fillText(
         "Happy Teachers' Day!",
@@ -539,13 +534,9 @@ function createPhotobooth() {
     );
 
 
-    ctx.font =
-        "16px Arial";
+    ctx.font = "16px Arial";
 
-
-    ctx.fillStyle =
-        "#888888";
-
+    ctx.fillStyle = "#888888";
 
     ctx.fillText(
         "A little memory with your students",
@@ -554,57 +545,47 @@ function createPhotobooth() {
     );
 
 
-    /* Photos */
+    /* =========================================
+       PHOTOS
+    ========================================= */
 
     photos.forEach((photo, index) => {
 
-        const x =
-            sideMargin;
-
+        const x = sideMargin;
 
         const y =
             topSpace +
-            index *
-            (photoHeight + gap);
+            index * (photoHeight + gap);
 
 
-        ctx.fillStyle =
-            "#ffffff";
+        /* Photo border */
 
+        ctx.fillStyle = selectedBorderColor;
 
         ctx.fillRect(
-            x - 3,
-            y - 3,
-            photoWidth + 6,
-            photoHeight + 6
+            x - 4,
+            y - 4,
+            photoWidth + 8,
+            photoHeight + 8
         );
 
 
-        const sourceWidth =
-            photo.width;
+        /* Photo */
 
+        const sourceWidth = photo.width;
 
-        const sourceHeight =
-            photo.height;
-
+        const sourceHeight = photo.height;
 
         const sourceRatio =
-            sourceWidth /
-            sourceHeight;
-
+            sourceWidth / sourceHeight;
 
         const targetRatio =
-            photoWidth /
-            photoHeight;
+            photoWidth / photoHeight;
 
 
-        let cropWidth =
-            sourceWidth;
+        let cropWidth = sourceWidth;
 
-
-        let cropHeight =
-            sourceHeight;
-
+        let cropHeight = sourceHeight;
 
         let cropX = 0;
 
@@ -614,24 +595,18 @@ function createPhotobooth() {
         if (sourceRatio > targetRatio) {
 
             cropWidth =
-                sourceHeight *
-                targetRatio;
-
+                sourceHeight * targetRatio;
 
             cropX =
-                (sourceWidth -
-                    cropWidth) / 2;
+                (sourceWidth - cropWidth) / 2;
 
         } else {
 
             cropHeight =
-                sourceWidth /
-                targetRatio;
-
+                sourceWidth / targetRatio;
 
             cropY =
-                (sourceHeight -
-                    cropHeight) / 2;
+                (sourceHeight - cropHeight) / 2;
         }
 
 
@@ -653,7 +628,9 @@ function createPhotobooth() {
     });
 
 
-    /* Footer */
+    /* =========================================
+       FOOTER
+    ========================================= */
 
     const footerY =
         stripHeight -
@@ -661,13 +638,9 @@ function createPhotobooth() {
         30;
 
 
-    ctx.fillStyle =
-        "#555555";
+    ctx.fillStyle = "#555555";
 
-
-    ctx.font =
-        "bold 17px Arial";
-
+    ctx.font = "bold 17px Arial";
 
     ctx.fillText(
         "Thank you for everything!",
@@ -676,13 +649,9 @@ function createPhotobooth() {
     );
 
 
-    ctx.font =
-        "14px Arial";
+    ctx.font = "14px Arial";
 
-
-    ctx.fillStyle =
-        "#999999";
-
+    ctx.fillStyle = "#999999";
 
     ctx.fillText(
         "Teachers' Day • 2026",
