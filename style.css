@@ -1097,3 +1097,145 @@ button {
         height: 47px;
     }
 }
+/* =========================================
+   BORDER COLOUR PICKER
+========================================= */
+
+.border-picker {
+    margin: 28px auto 24px;
+
+    text-align: center;
+}
+
+.border-picker-title {
+    margin-bottom: 13px;
+
+    color: #746b71;
+
+    font-size: 12px;
+
+    font-weight: 750;
+
+    letter-spacing: 0.5px;
+}
+
+.border-swatches {
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.border-swatch {
+    --swatch-color: #2B4593;
+
+    position: relative;
+
+    width: 46px;
+    height: 46px;
+
+    padding: 0;
+
+    border-radius: 15px;
+
+    background: var(--swatch-color);
+
+    border: 3px solid white;
+
+    box-shadow:
+        0 5px 15px rgba(40, 30, 35, 0.14);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.border-swatch::after {
+    content: "";
+
+    position: absolute;
+
+    inset: -5px;
+
+    border-radius: 18px;
+
+    border: 2px solid transparent;
+
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.border-swatch:hover {
+    transform: translateY(-4px) scale(1.05);
+
+    box-shadow:
+        0 10px 22px rgba(40, 30, 35, 0.20);
+}
+
+.border-swatch:active {
+    transform: scale(0.95);
+}
+
+.border-swatch.active::after {
+    border-color: #29252a;
+
+    transform: scale(1.05);
+}
+
+.border-swatch.active::before {
+    content: "✓";
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: 900;
+
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.35);
+
+    z-index: 2;
+}
+
+
+/* =========================================
+   MOBILE COLOUR PICKER
+========================================= */
+
+@media (max-width: 700px) {
+
+    .border-picker {
+        margin-top: 24px;
+    }
+
+    .border-swatches {
+        gap: 10px;
+    }
+
+    .border-swatch {
+        width: 42px;
+        height: 42px;
+
+        border-radius: 13px;
+    }
+
+    .border-swatch::after {
+        border-radius: 16px;
+    }
+}
