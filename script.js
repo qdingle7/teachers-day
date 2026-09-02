@@ -1,894 +1,255 @@
-/* =========================================
-   RESET
-========================================= */
+const startButton = document.getElementById("startButton");
+const captureButton = document.getElementById("captureButton");
+const downloadButton = document.getElementById("downloadButton");
+const retakeButton = document.getElementById("retakeButton");
+const cameraBackButton = document.getElementById("cameraBackButton");
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+const homeSection = document.getElementById("homeSection");
+const cameraSection = document.getElementById("cameraSection");
+const resultSection = document.getElementById("resultSection");
 
-html {
-    scroll-behavior: smooth;
-}
+const video = document.getElementById("video");
+const photoCounter = document.getElementById("photoCounter");
+const progressPercent = document.getElementById("progressPercent");
+const progressFill = document.getElementById("progressFill");
 
-body {
-    min-height: 100vh;
+const progressDots =
+    document.querySelectorAll(".progress-dot");
 
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
+const captureHint =
+    document.getElementById("captureHint");
 
-    background:
-        radial-gradient(
-            circle at 15% 15%,
-            rgba(255, 220, 225, 0.8),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at 85% 85%,
-            rgba(225, 220, 255, 0.7),
-            transparent 30%
-        ),
-        #faf7f5;
+const countdownOverlay =
+    document.getElementById("countdownOverlay");
 
-    color: #29252a;
+const countdownNumber =
+    document.getElementById("countdownNumber");
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+const canvas =
+    document.getElementById("photoCanvas");
 
-    padding: 24px;
 
-    overflow-x: hidden;
-}
+let stream = null;
+let photos = [];
+let currentPhoto = 0;
 
 
 /* =========================================
-   APP
+   START CAMERA
 ========================================= */
 
-.app {
-    width: 100%;
-    max-width: 920px;
-}
+startButton.addEventListener("click", async () => {
+
+    try {
+
+        if (
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ) {
+
+            alert(
+                "Your browser does not support camera access."
+            );
+
+            return;
+        }
 
 
-/* =========================================
-   SCREENS
-========================================= */
+        stream = await navigator.mediaDevices.getUserMedia({
 
-.screen {
-    width: 100%;
+            video: {
+                facingMode: "user",
 
-    background: rgba(255, 255, 255, 0.82);
+                width: {
+                    ideal: 1280
+                },
 
-    border: 1px solid rgba(255, 255, 255, 0.9);
+                height: {
+                    ideal: 720
+                }
+            },
 
-    border-radius: 32px;
+            audio: false
+        });
 
-    box-shadow:
-        0 30px 80px rgba(50, 35, 45, 0.10),
-        0 8px 25px rgba(50, 35, 45, 0.05);
 
-    backdrop-filter: blur(20px);
+        video.srcObject = stream;
 
-    overflow: hidden;
+        await video.play();
 
-    animation: screenIn 0.5s ease;
-}
 
-@keyframes screenIn {
+        photos = [];
 
-    from {
-        opacity: 0;
-        transform: translateY(15px) scale(0.98);
+        currentPhoto = 0;
+
+
+        homeSection.classList.add("hidden");
+
+        resultSection.classList.add("hidden");
+
+        cameraSection.classList.remove("hidden");
+
+
+        captureButton.disabled = false;
+
+
+        updateCounter();
+
+        updateProgress();
+
+        updateCaptureHint();
+
+
+    } catch (error) {
+
+        console.error("Camera error:", error);
+
+
+        if (error.name === "NotAllowedError") {
+
+            alert(
+                "Camera access was denied. Please allow camera access in your browser settings and try again."
+            );
+
+        } else if (error.name === "NotFoundError") {
+
+            alert(
+                "No camera was found on this device."
+            );
+
+        } else {
+
+            alert(
+                "We couldn't access the camera. Please make sure your camera is available and try again."
+            );
+        }
     }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
+});
 
 
 /* =========================================
-   LANDING
+   TAKE PHOTO
 ========================================= */
 
-#homeSection {
-    text-align: center;
+captureButton.addEventListener("click", async () => {
 
-    padding:
-        65px
-        55px
-        45px;
-}
+    if (
+        !stream ||
+        video.readyState < 2
+    ) {
 
-
-/* Badge */
-
-.top-badge {
-    display: inline-flex;
-
-    align-items: center;
-    gap: 10px;
-
-    padding: 9px 17px;
-
-    border-radius: 50px;
-
-    background: #f8edf0;
-
-    color: #a25f70;
-
-    font-size: 11px;
-
-    font-weight: 800;
-
-    letter-spacing: 2px;
-}
-
-
-/* Camera icon */
-
-.hero-icon {
-    width: 86px;
-    height: 86px;
-
-    margin: 32px auto 24px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background:
-        linear-gradient(
-            145deg,
-            #fff1f3,
-            #f4eefe
+        alert(
+            "Camera isn't ready yet. Please wait a moment."
         );
 
-    border-radius: 28px;
-
-    font-size: 40px;
-
-    box-shadow:
-        0 15px 35px rgba(160, 100, 120, 0.12);
-
-    transform: rotate(-4deg);
-
-    animation: floatingCamera 3s ease-in-out infinite;
-}
-
-@keyframes floatingCamera {
-
-    0%, 100% {
-        transform: rotate(-4deg) translateY(0);
+        return;
     }
 
-    50% {
-        transform: rotate(2deg) translateY(-7px);
+
+    captureButton.disabled = true;
+
+
+    await countdown();
+
+
+    takePhoto();
+
+
+    currentPhoto++;
+
+
+    if (currentPhoto < 4) {
+
+        updateCounter();
+
+        updateProgress();
+
+        updateCaptureHint();
+
+
+        setTimeout(() => {
+
+            captureButton.disabled = false;
+
+        }, 500);
+
+
+    } else {
+
+        updateProgress();
+
+        finishPhotos();
     }
-}
-
-
-/* Heading */
-
-h1 {
-    font-size: clamp(48px, 7vw, 78px);
-
-    line-height: 0.95;
-
-    letter-spacing: -4px;
-
-    font-weight: 850;
-
-    color: #28242a;
-}
-
-h1 span {
-    color: #b96b7e;
-}
-
-
-/* Subtitle */
-
-.hero-subtitle {
-    margin-top: 25px;
-
-    color: #817980;
-
-    font-size: 17px;
-
-    line-height: 1.7;
-}
-
-
-/* =========================================
-   BUTTONS
-========================================= */
-
-button {
-    font-family: inherit;
-    border: none;
-    cursor: pointer;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-.primary-button {
-    margin-top: 32px;
-
-    min-width: 230px;
-
-    padding: 17px 22px;
-
-    border-radius: 16px;
-
-    display: inline-flex;
-
-    justify-content: center;
-    align-items: center;
-
-    gap: 35px;
-
-    background: #29252a;
-
-    color: white;
-
-    font-size: 16px;
-
-    font-weight: 750;
-
-    box-shadow:
-        0 12px 25px rgba(40, 35, 40, 0.18);
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease;
-}
-
-.primary-button:hover {
-    transform: translateY(-3px);
-
-    box-shadow:
-        0 17px 30px rgba(40, 35, 40, 0.22);
-
-    background: #3a343b;
-}
-
-.primary-button:active {
-    transform: translateY(0);
-}
-
-.button-arrow {
-    font-size: 21px;
-
-    transition: transform 0.2s ease;
-}
-
-.primary-button:hover .button-arrow {
-    transform: translateX(5px);
-}
-
-
-/* =========================================
-   HOW IT WORKS
-========================================= */
-
-.how-it-works {
-    max-width: 650px;
-
-    margin: 55px auto 0;
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    border-top: 1px solid #eee8e9;
-
-    padding-top: 25px;
-}
-
-.step {
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    text-align: left;
-
-    padding: 0 18px;
-
-    border-right: 1px solid #eee8e9;
-}
-
-.step:last-child {
-    border-right: none;
-}
-
-.step-number {
-    color: #c18391;
-
-    font-size: 12px;
-
-    font-weight: 800;
-
-    letter-spacing: 1px;
-}
-
-.step strong {
-    font-size: 13px;
-
-    display: block;
-
-    margin-bottom: 3px;
-}
-
-.step p {
-    color: #9b9297;
-
-    font-size: 11px;
-}
-
-
-/* =========================================
-   FOOTER
-========================================= */
-
-.tiny-footer {
-    margin-top: 35px;
-
-    color: #aaa1a6;
-
-    font-size: 12px;
-
-    letter-spacing: 0.5px;
-}
-
-
-/* =========================================
-   CAMERA SCREEN
-========================================= */
-
-.camera-screen {
-    padding: 30px;
-}
-
-
-/* Header */
-
-.camera-header {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 25px;
-}
-
-.camera-title {
-    font-size: 12px;
-
-    font-weight: 850;
-
-    letter-spacing: 2px;
-
-    color: #4c454b;
-}
-
-.camera-subtitle {
-    margin-top: 3px;
-
-    font-size: 13px;
-
-    color: #9b9297;
-}
-
-.icon-button {
-    width: 42px;
-    height: 42px;
-
-    border-radius: 13px;
-
-    background: #f4eff1;
-
-    color: #514950;
-
-    font-size: 21px;
-
-    transition: 0.2s;
-}
-
-.icon-button:hover {
-    background: #ebe2e5;
-
-    transform: translateX(-2px);
-}
-
-.camera-logo {
-    width: 42px;
-    height: 42px;
-
-    border-radius: 13px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background: #f8edf0;
-
-    color: #ad697a;
-}
-
-
-/* =========================================
-   PROGRESS
-========================================= */
-
-.progress-area {
-    max-width: 700px;
-
-    margin: 0 auto 18px;
-}
-
-.progress-label {
-    display: flex;
-
-    justify-content: space-between;
-
-    margin-bottom: 8px;
-
-    color: #746b71;
-
-    font-size: 12px;
-
-    font-weight: 700;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 5px;
-
-    background: #eee8ea;
-
-    border-radius: 10px;
-
-    overflow: hidden;
-}
-
-#progressFill {
-    width: 25%;
-    height: 100%;
-
-    background: #bd7183;
-
-    border-radius: inherit;
-
-    transition: width 0.4s ease;
-}
-
-.progress-dots {
-    display: flex;
-
-    justify-content: center;
-
-    gap: 7px;
-
-    margin-top: 10px;
-}
-
-.progress-dot {
-    width: 6px;
-    height: 6px;
-
-    border-radius: 50%;
-
-    background: #ded6d9;
-
-    transition: 0.3s;
-}
-
-.progress-dot.active {
-    width: 20px;
-
-    border-radius: 10px;
-
-    background: #bd7183;
-}
-
-
-/* =========================================
-   CAMERA
-========================================= */
-
-.camera-wrapper {
-    display: flex;
-
-    justify-content: center;
-}
-
-.camera-frame {
-    position: relative;
-
-    width: 100%;
-
-    max-width: 700px;
-
-    aspect-ratio: 16 / 10;
-
-    background: #171518;
-
-    border-radius: 24px;
-
-    overflow: hidden;
-
-    box-shadow:
-        0 20px 45px rgba(35, 25, 30, 0.18);
-}
-
-#video {
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    display: block;
-
-    transform: scaleX(-1);
-}
-
-
-/* Camera corners */
-
-.camera-corner {
-    position: absolute;
-
-    width: 35px;
-    height: 35px;
-
-    border-color: rgba(255,255,255,0.8);
-
-    border-style: solid;
-
-    pointer-events: none;
-}
-
-.top-left {
-    top: 18px;
-    left: 18px;
-
-    border-width: 3px 0 0 3px;
-
-    border-radius: 8px 0 0 0;
-}
-
-.top-right {
-    top: 18px;
-    right: 18px;
-
-    border-width: 3px 3px 0 0;
-
-    border-radius: 0 8px 0 0;
-}
-
-.bottom-left {
-    bottom: 18px;
-    left: 18px;
-
-    border-width: 0 0 3px 3px;
-
-    border-radius: 0 0 0 8px;
-}
-
-.bottom-right {
-    bottom: 18px;
-    right: 18px;
-
-    border-width: 0 3px 3px 0;
-
-    border-radius: 0 0 8px 0;
-}
-
-
-/* Camera tip */
-
-.camera-tip {
-    position: absolute;
-
-    top: 20px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    padding: 7px 12px;
-
-    border-radius: 20px;
-
-    background: rgba(20, 18, 20, 0.45);
-
-    backdrop-filter: blur(8px);
-
-    color: white;
-
-    font-size: 11px;
-
-    letter-spacing: 0.5px;
-}
+});
 
 
 /* =========================================
    COUNTDOWN
 ========================================= */
 
-.countdown-overlay {
-    position: absolute;
+function countdown() {
 
-    inset: 0;
+    return new Promise((resolve) => {
 
-    display: flex;
+        let count = 3;
 
-    align-items: center;
 
-    justify-content: center;
+        countdownOverlay.classList.remove("hidden");
 
-    background: rgba(0, 0, 0, 0.18);
+        showCountdown(count);
 
-    z-index: 5;
-}
 
-.countdown-overlay span {
-    color: white;
+        const timer = setInterval(() => {
 
-    font-size: clamp(100px, 18vw, 180px);
+            count--;
 
-    font-weight: 900;
 
-    line-height: 1;
+            if (count > 0) {
 
-    text-shadow:
-        0 8px 30px rgba(0,0,0,0.3);
+                showCountdown(count);
 
-    animation: countdownPop 0.9s ease;
-}
+            } else {
 
-@keyframes countdownPop {
+                clearInterval(timer);
 
-    0% {
-        opacity: 0;
 
-        transform: scale(1.5);
-    }
+                showCountdown("CHEESE!");
 
-    25% {
-        opacity: 1;
-    }
 
-    100% {
-        opacity: 0;
+                flashScreen();
 
-        transform: scale(0.8);
-    }
+
+                setTimeout(() => {
+
+                    countdownOverlay.classList.add("hidden");
+
+                    resolve();
+
+                }, 450);
+            }
+
+        }, 1000);
+    });
 }
 
 
 /* =========================================
-   CAPTURE
+   COUNTDOWN DISPLAY
 ========================================= */
 
-.capture-area {
-    text-align: center;
+function showCountdown(value) {
 
-    padding-top: 20px;
-}
+    countdownNumber.textContent = value;
 
-#captureHint {
-    color: #8e858b;
 
-    font-size: 12px;
+    countdownNumber.style.animation = "none";
 
-    margin-bottom: 13px;
-}
 
-.shutter-button {
-    width: 68px;
-    height: 68px;
+    void countdownNumber.offsetWidth;
 
-    border-radius: 50%;
 
-    padding: 5px;
-
-    background: white;
-
-    border: 2px solid #ded5d9;
-
-    box-shadow:
-        0 8px 20px rgba(45, 35, 40, 0.12);
-
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    transition:
-        transform 0.15s ease,
-        box-shadow 0.15s ease;
-}
-
-.shutter-button:hover {
-    transform: scale(1.07);
-
-    box-shadow:
-        0 12px 25px rgba(45, 35, 40, 0.18);
-}
-
-.shutter-button:active {
-    transform: scale(0.94);
-}
-
-.shutter-inner {
-    width: 52px;
-    height: 52px;
-
-    border-radius: 50%;
-
-    background: #29252a;
-
-    display: block;
-}
-
-.shutter-button:disabled {
-    opacity: 0.5;
-
-    cursor: wait;
-
-    transform: none;
-}
-
-
-/* =========================================
-   RESULT SCREEN
-========================================= */
-
-.result-screen {
-    text-align: center;
-
-    padding:
-        50px
-        35px
-        35px;
-}
-
-.result-badge {
-    display: inline-block;
-
-    padding: 8px 14px;
-
-    border-radius: 50px;
-
-    background: #f8edf0;
-
-    color: #a25f70;
-
-    font-size: 10px;
-
-    font-weight: 850;
-
-    letter-spacing: 2px;
-}
-
-.result-screen h2 {
-    margin-top: 18px;
-
-    font-size: clamp(34px, 5vw, 48px);
-
-    letter-spacing: -2px;
-}
-
-.result-screen h2 span {
-    color: #bd7183;
-}
-
-.result-subtitle {
-    margin-top: 10px;
-
-    color: #91878d;
-
-    font-size: 15px;
-}
-
-
-/* =========================================
-   PHOTO PREVIEW
-========================================= */
-
-.photo-preview {
-    display: flex;
-
-    justify-content: center;
-
-    margin: 30px auto;
-
-    padding: 15px;
-
-    width: fit-content;
-
-    background: white;
-
-    border-radius: 18px;
-
-    box-shadow:
-        0 15px 40px rgba(40, 30, 35, 0.12);
-}
-
-#photoCanvas {
-    width: 100%;
-
-    max-width: 420px;
-
-    height: auto;
-
-    display: block;
-
-    border-radius: 8px;
-}
-
-
-/* =========================================
-   RESULT BUTTONS
-========================================= */
-
-.result-buttons {
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    gap: 10px;
-
-    flex-wrap: wrap;
-}
-
-.result-download {
-    margin-top: 0;
-
-    background: #29252a;
-}
-
-.secondary-button {
-    padding: 17px 22px;
-
-    border-radius: 16px;
-
-    background: #f1ebed;
-
-    color: #514950;
-
-    font-size: 15px;
-
-    font-weight: 750;
-
-    transition: 0.2s;
-}
-
-.secondary-button:hover {
-    background: #e8dfe2;
-
-    transform: translateY(-2px);
-}
-
-.result-footer {
-    margin-top: 25px;
+    countdownNumber.style.animation =
+        "countdownPop 0.9s ease";
 }
 
 
@@ -896,201 +257,552 @@ button {
    FLASH
 ========================================= */
 
-.camera-flash::after {
-    content: "";
+function flashScreen() {
 
-    position: fixed;
+    document.body.classList.add(
+        "camera-flash"
+    );
 
-    inset: 0;
 
-    background: white;
+    setTimeout(() => {
 
-    z-index: 9999;
+        document.body.classList.remove(
+            "camera-flash"
+        );
 
-    pointer-events: none;
-
-    animation: flash 0.18s ease-out;
+    }, 180);
 }
 
-@keyframes flash {
 
-    from {
-        opacity: 0.9;
+/* =========================================
+   TAKE PHOTO
+========================================= */
+
+function takePhoto() {
+
+    const photoCanvas =
+        document.createElement("canvas");
+
+
+    const width = video.videoWidth;
+
+    const height = video.videoHeight;
+
+
+    if (!width || !height) {
+
+        console.error(
+            "Camera dimensions are unavailable."
+        );
+
+        return;
     }
 
-    to {
-        opacity: 0;
+
+    photoCanvas.width = width;
+
+    photoCanvas.height = height;
+
+
+    const ctx =
+        photoCanvas.getContext("2d");
+
+
+    // Mirror selfie
+    ctx.translate(width, 0);
+
+    ctx.scale(-1, 1);
+
+
+    ctx.drawImage(
+        video,
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    photos.push(photoCanvas);
+}
+
+
+/* =========================================
+   UPDATE COUNTER
+========================================= */
+
+function updateCounter() {
+
+    photoCounter.textContent =
+        `Photo ${currentPhoto + 1} of 4`;
+}
+
+
+/* =========================================
+   UPDATE PROGRESS
+========================================= */
+
+function updateProgress() {
+
+    const completed =
+        Math.max(currentPhoto, 0);
+
+
+    const percent =
+        Math.round(
+            (completed / 4) * 100
+        );
+
+
+    progressPercent.textContent =
+        `${percent}%`;
+
+
+    progressFill.style.width =
+        `${percent}%`;
+
+
+    progressDots.forEach((dot, index) => {
+
+        dot.classList.toggle(
+            "active",
+            index === currentPhoto
+        );
+
+        if (currentPhoto === 4) {
+
+            dot.classList.add("active");
+        }
+    });
+}
+
+
+/* =========================================
+   CAPTURE HINT
+========================================= */
+
+function updateCaptureHint() {
+
+    const messages = [
+
+        "Ready? Let's get the first one",
+
+        "Nice! One more pose",
+
+        "You're doing great",
+
+        "Last one — make it count!"
+    ];
+
+
+    if (currentPhoto < 4) {
+
+        captureHint.textContent =
+            messages[currentPhoto];
     }
 }
 
 
 /* =========================================
-   HIDDEN
+   FINISH
 ========================================= */
 
-.hidden {
-    display: none !important;
+function finishPhotos() {
+
+    stopCamera();
+
+
+    cameraSection.classList.add(
+        "hidden"
+    );
+
+    resultSection.classList.remove(
+        "hidden"
+    );
+
+
+    createPhotobooth();
 }
 
 
 /* =========================================
-   MOBILE
+   STOP CAMERA
 ========================================= */
 
-@media (max-width: 700px) {
+function stopCamera() {
 
-    body {
-        padding: 12px;
+    if (stream) {
 
-        align-items: flex-start;
+        stream
+            .getTracks()
+            .forEach(track => {
+                track.stop();
+            });
 
-        padding-top: 12px;
+
+        stream = null;
     }
 
-    .screen {
-        border-radius: 24px;
-    }
 
-    #homeSection {
-        padding:
-            45px
-            22px
-            35px;
-    }
-
-    .hero-icon {
-        width: 72px;
-        height: 72px;
-
-        font-size: 32px;
-
-        margin-top: 27px;
-    }
-
-    h1 {
-        font-size: 52px;
-
-        letter-spacing: -3px;
-    }
-
-    .hero-subtitle {
-        font-size: 15px;
-    }
-
-    .primary-button {
-        width: 100%;
-
-        max-width: 300px;
-    }
-
-    .how-it-works {
-        grid-template-columns: 1fr;
-
-        gap: 17px;
-
-        text-align: left;
-
-        padding-top: 25px;
-    }
-
-    .step {
-        border-right: none;
-
-        padding: 0;
-    }
-
-    .camera-screen {
-        padding: 20px 14px 25px;
-    }
-
-    .camera-frame {
-        aspect-ratio: 4 / 3;
-
-        border-radius: 18px;
-    }
-
-    .camera-corner {
-        width: 25px;
-        height: 25px;
-    }
-
-    .top-left {
-        top: 12px;
-        left: 12px;
-    }
-
-    .top-right {
-        top: 12px;
-        right: 12px;
-    }
-
-    .bottom-left {
-        bottom: 12px;
-        left: 12px;
-    }
-
-    .bottom-right {
-        bottom: 12px;
-        right: 12px;
-    }
-
-    .camera-tip {
-        font-size: 9px;
-    }
-
-    .result-screen {
-        padding:
-            40px
-            18px
-            30px;
-    }
-
-    .result-buttons {
-        flex-direction: column;
-    }
-
-    .result-buttons button {
-        width: 100%;
-        max-width: 320px;
-    }
-
-    .photo-preview {
-        max-width: 90%;
-    }
+    video.srcObject = null;
 }
 
 
 /* =========================================
-   VERY SMALL PHONES
+   CREATE PHOTOBOOTH
 ========================================= */
 
-@media (max-width: 380px) {
+function createPhotobooth() {
 
-    h1 {
-        font-size: 44px;
-    }
+    /*
+       TEMPORARY VERSION
 
-    .hero-subtitle {
-        font-size: 14px;
-    }
+       This is still your current
+       vertical photo-strip design.
 
-    .camera-header {
-        margin-bottom: 18px;
-    }
+       We'll replace ONLY this function
+       later when you give me the final
+       photobooth template.
+    */
 
-    .camera-logo,
-    .icon-button {
-        width: 36px;
-        height: 36px;
-    }
 
-    .shutter-button {
-        width: 62px;
-        height: 62px;
-    }
+    const stripWidth = 420;
 
-    .shutter-inner {
-        width: 47px;
-        height: 47px;
-    }
+    const photoWidth = 360;
+
+    const photoHeight = 270;
+
+    const sideMargin = 30;
+
+    const topSpace = 95;
+
+    const gap = 10;
+
+    const bottomSpace = 90;
+
+
+    const stripHeight =
+        topSpace +
+        (photoHeight * 4) +
+        (gap * 3) +
+        bottomSpace;
+
+
+    canvas.width =
+        stripWidth;
+
+    canvas.height =
+        stripHeight;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    /* Background */
+
+    ctx.fillStyle =
+        "#fffafc";
+
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /* Title */
+
+    ctx.fillStyle =
+        "#333333";
+
+
+    ctx.font =
+        "bold 27px Arial";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.fillText(
+        "Happy Teachers' Day!",
+        stripWidth / 2,
+        38
+    );
+
+
+    ctx.font =
+        "16px Arial";
+
+
+    ctx.fillStyle =
+        "#888888";
+
+
+    ctx.fillText(
+        "A little memory with your students",
+        stripWidth / 2,
+        65
+    );
+
+
+    /* Photos */
+
+    photos.forEach((photo, index) => {
+
+        const x =
+            sideMargin;
+
+
+        const y =
+            topSpace +
+            index *
+            (photoHeight + gap);
+
+
+        ctx.fillStyle =
+            "#ffffff";
+
+
+        ctx.fillRect(
+            x - 3,
+            y - 3,
+            photoWidth + 6,
+            photoHeight + 6
+        );
+
+
+        const sourceWidth =
+            photo.width;
+
+
+        const sourceHeight =
+            photo.height;
+
+
+        const sourceRatio =
+            sourceWidth /
+            sourceHeight;
+
+
+        const targetRatio =
+            photoWidth /
+            photoHeight;
+
+
+        let cropWidth =
+            sourceWidth;
+
+
+        let cropHeight =
+            sourceHeight;
+
+
+        let cropX = 0;
+
+        let cropY = 0;
+
+
+        if (sourceRatio > targetRatio) {
+
+            cropWidth =
+                sourceHeight *
+                targetRatio;
+
+
+            cropX =
+                (sourceWidth -
+                    cropWidth) / 2;
+
+        } else {
+
+            cropHeight =
+                sourceWidth /
+                targetRatio;
+
+
+            cropY =
+                (sourceHeight -
+                    cropHeight) / 2;
+        }
+
+
+        ctx.drawImage(
+
+            photo,
+
+            cropX,
+            cropY,
+            cropWidth,
+            cropHeight,
+
+            x,
+            y,
+            photoWidth,
+            photoHeight
+        );
+
+    });
+
+
+    /* Footer */
+
+    const footerY =
+        stripHeight -
+        bottomSpace +
+        30;
+
+
+    ctx.fillStyle =
+        "#555555";
+
+
+    ctx.font =
+        "bold 17px Arial";
+
+
+    ctx.fillText(
+        "Thank you for everything!",
+        stripWidth / 2,
+        footerY
+    );
+
+
+    ctx.font =
+        "14px Arial";
+
+
+    ctx.fillStyle =
+        "#999999";
+
+
+    ctx.fillText(
+        "Teachers' Day • 2026",
+        stripWidth / 2,
+        footerY + 25
+    );
 }
+
+
+/* =========================================
+   DOWNLOAD
+========================================= */
+
+downloadButton.addEventListener(
+    "click",
+    () => {
+
+        const link =
+            document.createElement("a");
+
+
+        link.download =
+            "Teachers-Day-Photobooth-2026.png";
+
+
+        link.href =
+            canvas.toDataURL(
+                "image/png"
+            );
+
+
+        link.click();
+    }
+);
+
+
+/* =========================================
+   RETAKE
+========================================= */
+
+retakeButton.addEventListener(
+    "click",
+    () => {
+
+        stopCamera();
+
+
+        resultSection.classList.add(
+            "hidden"
+        );
+
+        cameraSection.classList.add(
+            "hidden"
+        );
+
+        homeSection.classList.remove(
+            "hidden"
+        );
+
+
+        photos = [];
+
+        currentPhoto = 0;
+
+
+        captureButton.disabled =
+            false;
+
+
+        updateCounter();
+
+        updateProgress();
+
+        updateCaptureHint();
+    }
+);
+
+
+/* =========================================
+   CAMERA BACK BUTTON
+========================================= */
+
+cameraBackButton.addEventListener(
+    "click",
+    () => {
+
+        stopCamera();
+
+
+        cameraSection.classList.add(
+            "hidden"
+        );
+
+        homeSection.classList.remove(
+            "hidden"
+        );
+
+
+        photos = [];
+
+        currentPhoto = 0;
+
+
+        captureButton.disabled =
+            false;
+
+
+        updateCounter();
+
+        updateProgress();
+
+        updateCaptureHint();
+    }
+);
+
+
+/* =========================================
+   CLEANUP
+========================================= */
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        stopCamera();
+
+    }
+);
