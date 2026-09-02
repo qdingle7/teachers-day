@@ -26,10 +26,16 @@ body {
     background: linear-gradient(
         90deg,
         #ADE1EF 0%,
-        #B7EDF7 20%,
-        #B4DAF9 40%,
-        #FEDBEC 60%,
-        #FBB1D3 80%,
+        #B7EDF7 10%,
+        #B4DAF9 20%,
+        #FEDBEC 30%,
+        #FBB1D3 40%,
+        #FFF1C2 50%
+        #ADE1EF 60%,
+        #B7EDF7 70%,
+        #B4DAF9 80%,
+        #FEDBEC 90%,
+        #FBB1D3 100%,
         #FFF1C2 100%
     );
 
