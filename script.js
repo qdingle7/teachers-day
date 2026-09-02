@@ -4,11 +4,6 @@ const downloadButton = document.getElementById("downloadButton");
 const retakeButton = document.getElementById("retakeButton");
 const cameraBackButton = document.getElementById("cameraBackButton");
 
-const borderSwatches =
-    document.querySelectorAll(".border-swatch");
-
-let selectedBorderColor = "#2B4593";
-
 const homeSection = document.getElementById("homeSection");
 const cameraSection = document.getElementById("cameraSection");
 const resultSection = document.getElementById("resultSection");
@@ -34,9 +29,17 @@ const canvas =
     document.getElementById("photoCanvas");
 
 
+/* =========================================
+   VARIABLES
+========================================= */
+
 let stream = null;
+
 let photos = [];
+
 let currentPhoto = 0;
+
+let selectedBorderColor = "#2B4593";
 
 
 /* =========================================
@@ -374,6 +377,7 @@ function updateProgress() {
             index === currentPhoto
         );
 
+
         if (currentPhoto === 4) {
 
             dot.classList.add("active");
@@ -486,14 +490,17 @@ function createPhotobooth() {
     canvas.height = stripHeight;
 
 
-    const ctx = canvas.getContext("2d");
+    const ctx =
+        canvas.getContext("2d");
 
 
     /* =========================================
-       COLOURED BORDER / BACKGROUND
+       MAIN COLOURED BORDER
     ========================================= */
 
-    ctx.fillStyle = selectedBorderColor;
+    ctx.fillStyle =
+        selectedBorderColor;
+
 
     ctx.fillRect(
         0,
@@ -504,10 +511,12 @@ function createPhotobooth() {
 
 
     /* =========================================
-       INNER WHITE AREA
+       WHITE INNER AREA
     ========================================= */
 
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle =
+        "#ffffff";
+
 
     ctx.fillRect(
         10,
@@ -521,11 +530,17 @@ function createPhotobooth() {
        TITLE
     ========================================= */
 
-    ctx.fillStyle = "#333333";
+    ctx.fillStyle =
+        "#333333";
 
-    ctx.font = "bold 27px Arial";
 
-    ctx.textAlign = "center";
+    ctx.font =
+        "bold 27px Arial";
+
+
+    ctx.textAlign =
+        "center";
+
 
     ctx.fillText(
         "Happy Teachers' Day!",
@@ -534,9 +549,13 @@ function createPhotobooth() {
     );
 
 
-    ctx.font = "16px Arial";
+    ctx.font =
+        "16px Arial";
 
-    ctx.fillStyle = "#888888";
+
+    ctx.fillStyle =
+        "#888888";
+
 
     ctx.fillText(
         "A little memory with your students",
@@ -551,16 +570,21 @@ function createPhotobooth() {
 
     photos.forEach((photo, index) => {
 
-        const x = sideMargin;
+        const x =
+            sideMargin;
+
 
         const y =
             topSpace +
-            index * (photoHeight + gap);
+            index *
+            (photoHeight + gap);
 
 
-        /* Photo border */
+        /* Coloured photo border */
 
-        ctx.fillStyle = selectedBorderColor;
+        ctx.fillStyle =
+            selectedBorderColor;
+
 
         ctx.fillRect(
             x - 4,
@@ -572,20 +596,31 @@ function createPhotobooth() {
 
         /* Photo */
 
-        const sourceWidth = photo.width;
+        const sourceWidth =
+            photo.width;
 
-        const sourceHeight = photo.height;
+
+        const sourceHeight =
+            photo.height;
+
 
         const sourceRatio =
-            sourceWidth / sourceHeight;
+            sourceWidth /
+            sourceHeight;
+
 
         const targetRatio =
-            photoWidth / photoHeight;
+            photoWidth /
+            photoHeight;
 
 
-        let cropWidth = sourceWidth;
+        let cropWidth =
+            sourceWidth;
 
-        let cropHeight = sourceHeight;
+
+        let cropHeight =
+            sourceHeight;
+
 
         let cropX = 0;
 
@@ -595,18 +630,24 @@ function createPhotobooth() {
         if (sourceRatio > targetRatio) {
 
             cropWidth =
-                sourceHeight * targetRatio;
+                sourceHeight *
+                targetRatio;
+
 
             cropX =
-                (sourceWidth - cropWidth) / 2;
+                (sourceWidth -
+                    cropWidth) / 2;
 
         } else {
 
             cropHeight =
-                sourceWidth / targetRatio;
+                sourceWidth /
+                targetRatio;
+
 
             cropY =
-                (sourceHeight - cropHeight) / 2;
+                (sourceHeight -
+                    cropHeight) / 2;
         }
 
 
@@ -638,9 +679,13 @@ function createPhotobooth() {
         30;
 
 
-    ctx.fillStyle = "#555555";
+    ctx.fillStyle =
+        "#555555";
 
-    ctx.font = "bold 17px Arial";
+
+    ctx.font =
+        "bold 17px Arial";
+
 
     ctx.fillText(
         "Thank you for everything!",
@@ -649,9 +694,13 @@ function createPhotobooth() {
     );
 
 
-    ctx.font = "14px Arial";
+    ctx.font =
+        "14px Arial";
 
-    ctx.fillStyle = "#999999";
+
+    ctx.fillStyle =
+        "#999999";
+
 
     ctx.fillText(
         "Teachers' Day • 2026",
@@ -660,35 +709,73 @@ function createPhotobooth() {
     );
 }
 
+
 /* =========================================
    BORDER COLOUR PICKER
 ========================================= */
 
-borderSwatches.forEach((swatch) => {
+function setupBorderPicker() {
 
-    swatch.addEventListener("click", () => {
-
-        selectedBorderColor =
-            swatch.dataset.color;
-
-
-        borderSwatches.forEach((item) => {
-
-            item.classList.remove("active");
-
-        });
+    const borderSwatches =
+        document.querySelectorAll(
+            ".border-swatch"
+        );
 
 
-        swatch.classList.add("active");
+    borderSwatches.forEach((swatch) => {
+
+        swatch.addEventListener(
+            "click",
+            function () {
+
+                const newColor =
+                    this.getAttribute(
+                        "data-color"
+                    );
 
 
-        // Rebuild the photobooth
-        // using the selected colour
-        createPhotobooth();
+                if (!newColor) {
+
+                    return;
+                }
+
+
+                selectedBorderColor =
+                    newColor;
+
+
+                /* Update selected button */
+
+                borderSwatches.forEach(
+                    (item) => {
+
+                        item.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+                this.classList.add(
+                    "active"
+                );
+
+
+                /* Redraw actual photobooth */
+
+                if (photos.length === 4) {
+
+                    createPhotobooth();
+
+                }
+
+            }
+        );
 
     });
+}
 
-});
 
 /* =========================================
    DOWNLOAD
@@ -809,3 +896,10 @@ window.addEventListener(
 
     }
 );
+
+
+/* =========================================
+   INITIALIZE
+========================================= */
+
+setupBorderPicker();
