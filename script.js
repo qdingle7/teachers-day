@@ -4,6 +4,11 @@ const downloadButton = document.getElementById("downloadButton");
 const retakeButton = document.getElementById("retakeButton");
 const cameraBackButton = document.getElementById("cameraBackButton");
 
+const borderSwatches =
+    document.querySelectorAll(".border-swatch");
+
+let selectedBorderColor = "#2B4593";
+
 const homeSection = document.getElementById("homeSection");
 const cameraSection = document.getElementById("cameraSection");
 const resultSection = document.getElementById("resultSection");
@@ -686,6 +691,35 @@ function createPhotobooth() {
     );
 }
 
+/* =========================================
+   BORDER COLOUR PICKER
+========================================= */
+
+borderSwatches.forEach((swatch) => {
+
+    swatch.addEventListener("click", () => {
+
+        selectedBorderColor =
+            swatch.dataset.color;
+
+
+        borderSwatches.forEach((item) => {
+
+            item.classList.remove("active");
+
+        });
+
+
+        swatch.classList.add("active");
+
+
+        // Rebuild the photobooth
+        // using the selected colour
+        createPhotobooth();
+
+    });
+
+});
 
 /* =========================================
    DOWNLOAD
